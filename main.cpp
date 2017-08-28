@@ -7,77 +7,69 @@ using namespace std;
 
 const size_t MAX_SIZE = 501;
 
-typedef long long TNumber;
-
-
 int main(void) {
 	size_t height;
 	size_t width;
 	cin >> height >> width;
 	char map[MAX_SIZE][MAX_SIZE];
 
-	//vector < vector<int> > a (n, vector<int> (m));
 	for (size_t i = 0; i < height; i++) {
 		for (size_t j = 0; j < width; j++) {
-			cin >> map[i][j];
+			char in_tmp;
+			cin >> in_tmp;
+			if (in_tmp == '1') {
+				map[i][j] = 0;
+				//map[i][j] = 1; //INVERT AFTER TESTING!!!
+			} else {
+				map[i][j] = 1;
+				//map[i][j] = 0; //INVERT AFTER TESTING!!!
+			}
 		}
 	}
-	 
-	TNumber result = 0;
-	vector<TNumber> dynamics(width, -1);
-	vector <TNumber> dynamics_extra[2];
-	dynamics_extra[0].resize(width);
-	dynamics_extra[1].resize(width);
-	stack <TNumber> u_stack;
 
+	int tmp[MAX_SIZE];
+	for (size_t i = 0; i < width; i++) {
+		tmp[i] = 0;
+	}
+	cout << endl;
+
+	size_t res = 0;
 	for (size_t i = 0; i < height; i++) {
+		size_t res_tmp = 0;
+		size_t min_height = 0;
+		size_t current_width = 0;
 		for (size_t j = 0; j < width; j++) {
-			if (map[i][j] == 1) {
-				dynamics[j] = i;
-			}
-		}
-
-		while (!u_stack.empty()) {
-			u_stack.pop();
-		}
-
-		for (size_t j = 0; j < width; ++j) {
-			while (!u_stack.empty() && dynamics[u_stack.top()] <= dynamics[j]) {
-				u_stack.pop();
-			}
-
-			if (!u_stack.empty()) {
-				dynamics_extra[0][j] = u_stack.top();
+			if (map[i][j] != 0) {
+				tmp[j]++;
 			} else {
-				dynamics_extra[0][j] = -1;
+				tmp[j] = 0;
 			}
-			u_stack.push(j);
-		}
+			cout << tmp[j] << ' ';
 
-		while (!u_stack.empty()) {
-			u_stack.pop();
-		}
-
-		for (size_t j_tmp = width; j_tmp > 0; j_tmp--) {
-			size_t j = j_tmp - 1;
-			while (!u_stack.empty() && dynamics[u_stack.top()] <= dynamics[j]) {
-				u_stack.pop();
+			if (tmp[j] == 0) {
+				res_tmp = 0;
+				min_height = 0;
+				current_width = 0;
+				continue;
 			}
 
-			if (!u_stack.empty()) {
-				dynamics_extra[1][j] = u_stack.top();
-			} else {
-				dynamics_extra[1][j] = width;
-			}
-			u_stack.push(j);
-		}
+			current_width++;
 
-		for (size_t j = 0; j < width; j++) {
-			result = max(result, (TNumber) (i - dynamics[j]) * (dynamics_extra[1][j] - dynamics_extra[0][j] - 1));
+			if (min_height == 0 || (size_t) tmp[j] < min_height) {
+				//cout << "min_height = " << min_height << endl;
+				//cout << "tmp[j] = " << tmp[j] << endl;
+				min_height = tmp[j];
+			}
+			res_tmp = current_width * min_height;
+			cout << current_width << " * " << min_height << " = " << res_tmp << endl;
+			if (res_tmp > res) {
+				res = res_tmp;
+			}
 		}
+		cout << endl;
 	}
-	 
-	cout << result << endl;
+
+	cout << res << endl;
 
 	return 0;	
 }
